@@ -152,16 +152,18 @@ class App extends Component {
 //            props로 받은 삭제함수와 선택함수를 실제로 수행
 class BoardItem extends Component {
   // 삭제함수
+  // 부모한테서 받은 props가 있으므로 인자 따로 필요없음
   handleRemove = () => {
-    // 받아온 row 데이터와 onRemove 함수 세팅
+    // 받아온 row 데이터와 onRemove를 props로 세팅
     const { row, onRemove } = this.props;
     // row 데이터 중 brdno로 onRemove(= handleRemove 함수) 실행
     onRemove(row.brdno);
   }
 
   // 선택함수
+  // 부모한테서 받은 props가 있으므로 인자 따로 필요없음
   handleSelectRow = () => {
-    // 받아온 row 데이터와 onSelectRow 함수 세팅
+    // 받아온 row 데이터와 onSelectRow를 props로 세팅
     const { row, onSelectRow } = this.props;
     // row 데이터로 onSelectRow(= handleSelectRow 함수) 실행
     onSelectRow(row);
@@ -182,7 +184,7 @@ class BoardItem extends Component {
             (=> 이 부분은 실제 게시판 글작성 페이지로 이동하도록 수정해야) 
             입력상자는 BoardForm에 있기 때문에 BoardForm을 부모(App) 컴포넌트가 알고 있어야 함
             즉, 부모가 자식(BoardForm)의 이벤트를 처리하는 handler를 가지고 있어야 한다.*/}
-        {/* 제목을 link로 만들어야 하므로 a 태그 사용 */}
+        {/* 제목을 link로 만들어야 하므로 a 태그 안에 넣어줌 */}
         <td><a onClick={this.handleSelectRow}>{this.props.row.brdtitle}</a></td>
         <td>{this.props.row.brdwriter}</td>
         {/* toLocaleDateString('ko-KR'): date 객체를 한국날짜 기준으로 바꿈 (출력값 예: 2021. 6. 2.) => 영어는 'en-US' */}
@@ -216,11 +218,12 @@ class BoardForm extends Component {
       //      brdtitle: e.target.value,
       //      brdwriter: e.target.value
       //    } 
-    })
+    });
   }
 
   // 2번째 state 변경함수 - title로 항목 중 하나 클릭 시
-  // 받아온 row 데이터로 state 변경 (렌더링 시 쓰지는 않고 input창에 선택한 brdtitle과 brdwriter이 나타나게 하는 역할만)
+  // 받아온 row 데이터 전체로 state 변경 (key, value를 나눌 필요가 없으므로 setState()에 바로 넣어준다)
+  // (렌더링 시에 사용하는 함수 아님, 선택한 brdtitle과 brdwriter만 input창에 보여주는 역할)
   handleSelectRow = (row) => {
     this.setState(row); 
   }
@@ -251,7 +254,7 @@ class BoardForm extends Component {
 
   render() {
     return (
-      // type이 submit인 button을 누르면 form의 onSubmit에 등록된 함수가 실행됨
+      // type이 submit인 button을 누르면 form의 제출함수 실행됨
       <form onSubmit={this.handleSubmit}>
         {/* (컴포넌트 내의 변수나 함수를 참조할 때는 this 붙여야) */}
         {/* value에 state 값의 key를 설정해서 input에 입력값이 들어올 때마다 해당 state값이 자동으로 바뀌도록 함 */}
@@ -259,7 +262,7 @@ class BoardForm extends Component {
         <input placeholder="name" name="brdwriter" value={this.state.brdwriter} onChange={this.handleChange} />
         <button type="submit">Save</button>
       </form>
-    )
+    );
   }
 }
 

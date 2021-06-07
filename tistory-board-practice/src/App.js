@@ -82,39 +82,68 @@ class App extends Component {
 
 
 class BoardItem extends Component {
-	
+	handleRemove = () => {
+		const { row, onRemove } = this.props;
+		onRemove(row.brdno);
+	}
 
+	handleSelectRow = () => {
+		const { row, onSelectRow } = this.props;
+		onSelectRow(row);
+	}
 
+	render() {
+		return (
+			<tr>
+				<td>{this.props.row.brdno}</td>
+				<td><a onClick={this.handleSelectRow}>{this.props.row.brdtitle}</a></td>
+				<td>{this.props.row.brdwriter}</td>
+				<td>{this.props.row.brddate.toLocaleDateString('ko-KR')}</td>
+				<td><button onClick={this.handleRemove}>X</button></td>
+			</tr>
+		);
+	}
 }
-
 
 
 class BoardForm extends Component {
+	state = {
+		brdtitle: '',
+		brdwriter: '',
+	};
 
+	handleChange = (e) => {
+		this.setState({
+			[e.target.name]: e.target.value,
+		});
+	}
 
-	
+	handleSelectRow = (row) => {
+		this.setState(row);
+	}
+
+	handleSubmit = (e) => {
+		e.preventDefault();
+		this.props.onSaveData(this.state);
+		this.setState({
+			brdno: '',
+			brdtitle: '',
+			brdwriter: '',
+		});
+	}
+
+	render() {
+		return (
+			<form onSubmit={this.handleSubmit}>
+				<input placeholder="title" name="brdtitle" value={this.state.brdtitle} onChange={this.handleChange} />
+				<input placeholder="name" name="brdwriter" value={this.state.brdwriter} onChange={this.handleChange} />
+				<button type="submit">Save</button>
+			</form>
+		);
+	}
 }
-//BoardForm
 
-//state 초기화 = 입력창 값
-
-// 1번째 state 변경함수
-// 입력된 name(brdtitle 또는 brdwriter)을 key값으로 하고, 입력된 value를 value값으로 함
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default App;
 
 
 
@@ -130,4 +159,40 @@ class BoardForm extends Component {
 
 //선택함수 (인자: row)
 
-//render() - div로 한번 묶고 + BoardForm + boards에서 꺼내서 BoardItem 반환
+//render() - div로 한번 묶기 + BoardForm + boards에서 꺼내서 BoardItem 반환
+
+
+
+//BoardForm
+
+// state 초기화 = 입력창 값
+
+// 1번째 state 변경함수 (change, 인자: e, setState, [])
+// 2번째 state 변경함수 (selectRow, 인자: row, setState)
+
+// 제출함수 (인자: e)
+//	e.~
+// props의 저장함수 실행 (인자: 변경된 state)
+// 공백처리
+
+//render() (form이 하나로 묶어줘서 div 필요 없음)
+//<form>, <input>*2, <button>
+
+
+
+//BoardItem
+
+//삭제함수 (인자 x)
+//this.props로 세팅
+//함수 실행
+
+//선택함수 (인자 x)
+//this.props로 세팅
+//함수 실행
+
+//render()
+//<tr> 반환 (div 필요없음)
+//td*5 (받아온 row를 한껏 사용 - no, title(link - <a>), writer, date(toLocaleDateString()), 삭제버튼)
+
+
+
