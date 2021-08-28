@@ -29,7 +29,7 @@ class BoardItem extends Component {
 					{/* App_reducer에 있는 board_remove를 호출해서 삭제 */}
 					<a onClick={() => { this.props.dispatch(board_remove(row.brdno)) }}>
 						X
-					</a>{row.brdno}
+					</a>
 				</td>
 			</tr>
 		);
