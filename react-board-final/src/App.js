@@ -2,6 +2,8 @@
 import React, { Component, createRef } from 'react';
 
 class App extends Component {
+  // constructor(초기값)로 this.child(App의 하위 컴포넌트들)에 createRef 지정
+  //    => 이후 하위 컴포넌트에서 ref={this.child}로 App의 createRef를 props로 사용 가능
   constructor(props) {
     super(props);
     this.child = createRef();
@@ -25,19 +27,19 @@ class App extends Component {
     ],
   };
 
-  // 새로 입력된 데이터 저장 (보여주기)
+  // 새로 입력된 데이터로 state 수정(저장)
   handleSaveData = (data) => {
-    // 여기서 data는 state({ brdtitle: 입력값, brdwriter: 입력값 }) 형태로 넘어옴
+    // 여기서 data는 state(= { brdtitle: 입력값, brdwriter: 입력값 }) 형태로 넘어옴
 
-    // (this.state.boards가 반복되니까 이 부분만 변수로 뺌)
+    // 반복되는 this.state.boards를 변수로 뺌
     let boards = this.state.boards;
 
     // 받아온 data의 brdno이 기존에 없는 경우 => 글 신규작성
     if (data.brdno === null || data.brdno === '' || data.brdno === undefined) {
       // 클래스 컴포넌트의 좋은 점: 사본 안 만들고 setState로 state 바로 수정 가능
       this.setState({
-        // maxNo 주의: 사용할 때(boards에 concat할 때) ++을 붙이면 warning 발생
-        //   => setState 범위 내에서 수정 후 사용
+        // maxNo 주의: boards에 concat할 때(사용할 때) ++을 붙이면 warning 발생
+        //   => setState 내에서 수정 후 사용
         maxNo: this.state.maxNo + 1,
         boards: boards.concat({
           brdno: this.state.maxNo,
@@ -67,6 +69,8 @@ class App extends Component {
     });
   };
 
+  // BoardItem으로 전달되어 클릭한 row 데이터를 받아오는 함수
+  // row 데이터를 받아서 this.child(여기서는 BoardForm)의 handleSelectRow 함수를 실행하면서 row를 넘겨줌 (App에서 BoardForm으로 넘어감)
   handleSelectRow = (row) => {
     this.child.current.handleSelectRow(row);
   };
@@ -79,6 +83,7 @@ class App extends Component {
 
     return (
       <div>
+        {/* App의 constructor에 있는 createRef를 사용하기 위해 ref={this.child}로 받아옴 */}
         <BoardForm onSaveData={this.handleSaveData} ref={this.child} />
         <table border="1">
           <tbody>
@@ -91,8 +96,10 @@ class App extends Component {
             {boards.map((row) => (
               <BoardItem
                 key={row.brdno}
+                // BoardItem에 row 전달
                 row={row}
                 onRemove={this.handleRemove}
+                // BoardItem에 App의 handleSelectRow 함수 전달
                 onSelectRow={this.handleSelectRow}
               />
             ))}
@@ -111,6 +118,9 @@ class BoardItem extends Component {
     onRemove(row.brdno);
   };
 
+  // 수정과정 2. App으로부터 전달받은 row와 onSelectRow를 props로 받아와서
+  //      onSelectRow(App의 handleSelectRow)에 클릭한 row 넣어주는 작업 처리
+  //      (=> App과 BoardItem 연결하는 함수)
   handleSelectRow = () => {
     const { row, onSelectRow } = this.props;
     onSelectRow(row);
@@ -121,6 +131,12 @@ class BoardItem extends Component {
       <tr>
         <td>{this.props.row.brdno}</td>
         <td>
+          {/* 수정 1: 사용자가 글 리스트 중 하나의 title을 클릭하면 BoardItem의 handleSelectRow 호출 */}
+          {/* 선택된 row의 값들을 사용자가 수정할 수 있게 입력상자에 넣어주어야 함 */}
+          {/* 입력상자는 BoardForm에 있기 때문에 BoardForm을 부모 컴포넌트(App)이 알고 있어야 함 
+            => 자식의 handle 함수를 갖고 있어야 함
+            => 컴포넌트의 handle 함수를 가져오는 ref를 
+              App의 하위 컴포넌트들을 가리키는 this.child에 보관하는 방법 사용 */}
           <a onClick={this.handleSelectRow}>{this.props.row.brdtitle}</a>
         </td>
         <td>{this.props.row.brdwriter}</td>
@@ -150,6 +166,9 @@ class BoardForm extends Component {
     });
   };
 
+  // 부모한테서 받은 row를 이용하여 BoardForm 내의 state 변경
+  //    => input 창에 row의 brdtitle과 brdwriter가 들어가서 사용자가 수정이 가능해짐
+  //    => 이후 저장 버튼 누르면 App의 handleSaveData 함수(수정 및 생성) 실행
   handleSelectRow = (row) => {
     this.setState(row);
   };
